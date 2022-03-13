@@ -1,20 +1,11 @@
 version: "3.8"
 
 services:
-  proxy:
-    image: nginx:1.21.6-alpine # ~5mb
-    container_name: napenshe-server
-    volumes:
-      - ./index.html:/usr/share/nginx/html/index.html
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - 80:80
-    restart: unless-stopped
-    depends_on:
-      - web
-
   web: 
     container_name: napenshe-web
+    networks:
+      - devops
+      - local_network
     build: 
       context: .
       dockerfile: DevOpsOshnokov/Dockerfile
@@ -26,7 +17,15 @@ services:
   db:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: napenshe-db
+    networks:
+      - local_network
     environment: 
       - ACCEPT_EULA=Y
       - MSSQL_PID=Express
       - SA_PASSWORD=${SA_PASSWORD}
+
+networks:
+  devops:
+    name: devops_net
+  local_network: 
+
